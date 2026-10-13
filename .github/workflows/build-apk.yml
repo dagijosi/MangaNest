@@ -1,0 +1,93 @@
+name: Build MangaNest Android APK
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type (release or debug)'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Native Android Project
+        run: npx expo prebuild --platform android --clean
+
+      - name: Make Gradle Wrapper Executable
+        run: chmod +x android/gradlew
+
+      - name: Build Release APK
+        if: "${{ github.event.inputs.build_type == 'release' || github.event.inputs.build_type == '' }}"
+        run: |
+          cd android
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Build Debug APK
+        if: "${{ github.event.inputs.build_type == 'debug' }}"
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Locate and Rename APK
+        run: |
+          mkdir -p build_output
+          if [ -f "android/app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+            cp android/app/build/outputs/apk/release/app-release-unsigned.apk build_output/MangaNest.apk
+          elif [ -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
+            cp android/app/build/outputs/apk/release/app-release.apk build_output/MangaNest.apk
+          elif [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            cp android/app/build/outputs/apk/debug/app-debug.apk build_output/MangaNest.apk
+          else
+            find android/app/build/outputs/apk -name "*.apk" -exec cp {} build_output/MangaNest.apk \;
+          fi
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MangaNest-APK
+          path: build_output/MangaNest.apk
+          retention-days: 14
+
+      - name: Create GitHub Release and Upload APK
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build_output/MangaNest.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
