@@ -18,7 +18,7 @@ export const UpdateService = {
     return Constants.expoConfig?.version || '1.0.0';
   },
 
-  async checkForUpdates(repoSlug: string = 'your-username/MangaNest'): Promise<AppReleaseInfo> {
+  async checkForUpdates(repoSlug: string = 'dagijosi/MangaNest'): Promise<AppReleaseInfo> {
     const currentVersion = this.getCurrentVersion();
 
     try {
