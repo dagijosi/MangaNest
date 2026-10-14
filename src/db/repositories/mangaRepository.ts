@@ -122,8 +122,16 @@ export const MangaRepository = {
 
     query += ' ORDER BY updated_at DESC';
 
-    const rows = await db.getAllAsync<MangaRow>(query, ...params);
-    return rows.map(mapRowToManga);
+    try {
+      const rows =
+        params.length > 0
+          ? await db.getAllAsync<MangaRow>(query, ...params)
+          : await db.getAllAsync<MangaRow>(query);
+      return rows.map(mapRowToManga);
+    } catch (err) {
+      console.warn('Error querying library:', err);
+      return [];
+    }
   },
 
   async setInLibrary(id: string, inLibrary: boolean): Promise<void> {

@@ -9,6 +9,7 @@ import { MangaCard } from '../../components/common/MangaCard';
 import { SearchBar } from '../../components/common/SearchBar';
 import { EmptyState } from '../../components/common/EmptyState';
 import { MangaRepository } from '../../db/repositories/mangaRepository';
+import { MOCK_MANGA_LIST } from '../../providers/mock/mockData';
 import { MangaItem, MangaType } from '../../providers/types';
 import { useAppTheme, usePreferencesStore } from '../../store/preferencesStore';
 
@@ -41,9 +42,19 @@ export default function LibraryScreen() {
         type: activeFilter,
         searchQuery,
       });
-      setLibraryItems(items);
+      if (items.length > 0 || searchQuery) {
+        setLibraryItems(items);
+      } else {
+        const fallback = MOCK_MANGA_LIST.filter((item) => {
+          if (!item.inLibrary) return false;
+          if (activeFilter !== 'all' && item.type !== activeFilter) return false;
+          return true;
+        });
+        setLibraryItems(fallback);
+      }
     } catch (e) {
       console.warn('Failed to load library:', e);
+      setLibraryItems(MOCK_MANGA_LIST.filter((i) => i.inLibrary));
     }
   }, [activeFilter, searchQuery]);
 

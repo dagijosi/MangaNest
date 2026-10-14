@@ -1,16 +1,16 @@
 import * as SQLite from 'expo-sqlite';
 
-let dbInstance: SQLite.SQLiteDatabase | null = null;
+let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
 export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
-  if (dbInstance) {
-    return dbInstance;
+  if (!dbPromise) {
+    dbPromise = (async () => {
+      const db = await SQLite.openDatabaseAsync('manganest.db');
+      await initDatabase(db);
+      return db;
+    })();
   }
-
-  const db = await SQLite.openDatabaseAsync('manganest.db');
-  await initDatabase(db);
-  dbInstance = db;
-  return db;
+  return dbPromise;
 }
 
 async function initDatabase(db: SQLite.SQLiteDatabase) {
