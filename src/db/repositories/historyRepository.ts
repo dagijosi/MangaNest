@@ -37,18 +37,22 @@ export const HistoryRepository = {
       completed ? 1 : 0
     );
 
-    // Also update chapter table progress
-    await db.runAsync(
-      `UPDATE chapters SET
-         read_progress = ?,
-         is_read = ?,
-         last_read_at = ?
-       WHERE id = ?`,
-      progress,
-      completed ? 1 : 0,
-      now,
-      chapterId
-    );
+    // Also update chapter table progress if chapter exists
+    try {
+      await db.runAsync(
+        `UPDATE chapters SET
+           read_progress = ?,
+           is_read = ?,
+           last_read_at = ?
+         WHERE id = ?`,
+        progress,
+        completed ? 1 : 0,
+        now,
+        chapterId
+      );
+    } catch {
+      // Safe to ignore if chapter record has not been inserted
+    }
   },
 
   async getRecentHistory(limit: number = 50): Promise<HistoryRecord[]> {

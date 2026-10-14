@@ -157,7 +157,10 @@ export const MangaRepository = {
 
   async resetAndSeed(items: MangaItem[]): Promise<void> {
     const db = await getDatabase();
-    await db.runAsync('DELETE FROM manga');
+    try {
+      await db.runAsync('DELETE FROM reading_history');
+      await db.runAsync('DELETE FROM manga');
+    } catch {}
     for (const item of items) {
       await this.upsert(item);
     }

@@ -14,10 +14,26 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
 }
 
 async function initDatabase(db: SQLite.SQLiteDatabase) {
-  // Enable foreign keys
-  await db.execAsync('PRAGMA foreign_keys = ON;');
+  // Disable foreign key constraints as chapter IDs and manga sources are dynamically fetched from remote providers
+  await db.execAsync('PRAGMA foreign_keys = OFF;');
 
-  // Schema creation
+  // Clean up any legacy tables that still have FOREIGN KEY / REFERENCES constraints in their schema
+  try {
+    const legacyTables = await db.getAllAsync<{ name: string; sql: string }>(
+      "SELECT name, sql FROM sqlite_master WHERE type='table' AND sql LIKE '%REFERENCES%';"
+    );
+    if (legacyTables && legacyTables.length > 0) {
+      for (const table of legacyTables) {
+        if (table.name && !table.name.startsWith('sqlite_')) {
+          await db.execAsync(`DROP TABLE IF EXISTS ${table.name};`);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Legacy table cleanup check error:', err);
+  }
+
+  // Ensure schema tables exist without conflicting foreign key constraints on dynamic chapter IDs
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS manga (
       id TEXT PRIMARY KEY,
@@ -50,9 +66,7 @@ async function initDatabase(db: SQLite.SQLiteDatabase) {
     CREATE TABLE IF NOT EXISTS manga_categories (
       manga_id TEXT NOT NULL,
       category_id TEXT NOT NULL,
-      PRIMARY KEY (manga_id, category_id),
-      FOREIGN KEY(manga_id) REFERENCES manga(id) ON DELETE CASCADE,
-      FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE CASCADE
+      PRIMARY KEY (manga_id, category_id)
     );
 
     CREATE TABLE IF NOT EXISTS chapters (
@@ -70,8 +84,7 @@ async function initDatabase(db: SQLite.SQLiteDatabase) {
       last_read_at INTEGER,
       is_downloaded INTEGER DEFAULT 0,
       download_path TEXT,
-      downloaded_at INTEGER,
-      FOREIGN KEY(manga_id) REFERENCES manga(id) ON DELETE CASCADE
+      downloaded_at INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS reading_history (
@@ -80,9 +93,7 @@ async function initDatabase(db: SQLite.SQLiteDatabase) {
       chapter_id TEXT NOT NULL,
       read_at INTEGER NOT NULL,
       progress REAL DEFAULT 0,
-      completed INTEGER DEFAULT 0,
-      FOREIGN KEY(manga_id) REFERENCES manga(id) ON DELETE CASCADE,
-      FOREIGN KEY(chapter_id) REFERENCES chapters(id) ON DELETE CASCADE
+      completed INTEGER DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS downloads (
@@ -95,9 +106,7 @@ async function initDatabase(db: SQLite.SQLiteDatabase) {
       size_bytes INTEGER DEFAULT 0,
       error TEXT,
       created_at INTEGER,
-      updated_at INTEGER,
-      FOREIGN KEY(chapter_id) REFERENCES chapters(id) ON DELETE CASCADE,
-      FOREIGN KEY(manga_id) REFERENCES manga(id) ON DELETE CASCADE
+      updated_at INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS app_preferences (
