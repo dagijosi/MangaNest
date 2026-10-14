@@ -175,7 +175,17 @@ export default function HistoryScreen() {
 
               {/* Resume Play Button */}
               <TouchableOpacity
-                onPress={() => router.push(`/reader/${item.chapterId}`)}
+                onPress={() =>
+                  router.push({
+                    pathname: '/reader/[chapterId]',
+                    params: {
+                      chapterId: item.chapterId,
+                      mangaId: item.mangaId,
+                      chapterNumber: String(item.chapterNumber),
+                      mangaTitle: item.mangaTitle,
+                    },
+                  })
+                }
                 activeOpacity={0.8}
                 style={[styles.resumeButton, { backgroundColor: colors.accentSoft }]}
               >

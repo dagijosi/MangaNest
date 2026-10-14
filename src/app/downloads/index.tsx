@@ -21,23 +21,10 @@ interface DownloadItem {
   status: 'downloading' | 'paused' | 'completed';
 }
 
-const INITIAL_DOWNLOADS: DownloadItem[] = [
-  {
-    id: 'dl-1',
-    mangaTitle: 'Solo Leveling',
-    chapterTitle: 'Chapter 201',
-    coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&auto=format&fit=crop&q=80',
-    progress: 48,
-    downloadedSize: '1.2 MB',
-    totalSize: '2.8 MB',
-    status: 'downloading',
-  },
-];
-
 export default function DownloadsScreen() {
   const { colors } = useAppTheme();
   const [activeTab, setActiveTab] = useState<DownloadTab>('downloading');
-  const [items, setItems] = useState<DownloadItem[]>(INITIAL_DOWNLOADS);
+  const [items, setItems] = useState<DownloadItem[]>([]);
 
   const togglePause = (id: string) => {
     setItems((prev) =>

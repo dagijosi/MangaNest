@@ -1,5 +1,5 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
+import React, { useRef } from 'react';
+import { router, Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookOpen, Compass, Clock, MoreHorizontal, RefreshCw } from 'lucide-react-native';
 import { useAppTheme } from '../../store/preferencesStore';
@@ -7,6 +7,7 @@ import { useAppTheme } from '../../store/preferencesStore';
 export default function TabLayout() {
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
+  const lastUpdatesTapRef = useRef<number>(0);
 
   return (
     <Tabs
@@ -44,6 +45,16 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="updates"
+        listeners={{
+          tabPress: (e) => {
+            const now = Date.now();
+            if (now - lastUpdatesTapRef.current < 450) {
+              e.preventDefault();
+              router.push('/downloads');
+            }
+            lastUpdatesTapRef.current = now;
+          },
+        }}
         options={{
           title: 'Updates',
           tabBarIcon: ({ color, size }) => <RefreshCw size={21} color={color} strokeWidth={2} />,

@@ -1,26 +1,6 @@
 import { ChapterItem, ChapterPage, MangaItem, SourceProvider } from '../types';
-import { MOCK_READER_PAGES } from '../mock/mockData';
 
-export const LOCAL_SAMPLE_MANGA: MangaItem[] = [
-  {
-    id: 'local:my-hero-academia',
-    sourceId: 'my-hero-academia',
-    providerId: 'local',
-    title: 'My Hero Academia (Local CBZ)',
-    coverUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
-    author: 'Kohei Horikoshi',
-    description: 'Local manga comic archive imported directly from device storage.',
-    genres: ['Action', 'Superhero', 'Shounen'],
-    status: 'ongoing',
-    type: 'manga',
-    rating: 4.8,
-    ratingCount: 1540,
-    inLibrary: false,
-    totalChapters: 12,
-    unreadCount: 2,
-    updatedAt: 'Device Storage',
-  },
-];
+export const LOCAL_SAMPLE_MANGA: MangaItem[] = [];
 
 export class LocalSourceProvider implements SourceProvider {
   id = 'local';
@@ -84,6 +64,6 @@ export class LocalSourceProvider implements SourceProvider {
   }
 
   async getPageList(_sourceChapterId: string): Promise<ChapterPage[]> {
-    return MOCK_READER_PAGES;
+    return [];
   }
 }

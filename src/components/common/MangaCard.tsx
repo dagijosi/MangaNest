@@ -21,6 +21,13 @@ export function MangaCard({
   isSelected,
 }: MangaCardProps) {
   const { colors } = useAppTheme();
+  const sourceName =
+    item.providerName ||
+    (item.providerId === 'mangadex'
+      ? 'MangaDex'
+      : item.providerId === 'comick'
+      ? 'ComicK'
+      : item.providerId);
 
   if (layout === 'list') {
     return (
@@ -48,9 +55,16 @@ export function MangaCard({
             <Text style={[styles.listTitle, { color: colors.textPrimary }]} numberOfLines={1}>
               {item.title}
             </Text>
-            <Text style={[styles.listTypeBadge, { color: colors.accentText }]}>
-              {item.type.toUpperCase()}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <View style={[styles.sourceBadgePill, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceBorder }]}>
+                <Text style={[styles.sourceBadgeText, { color: colors.accent }]}>
+                  {sourceName}
+                </Text>
+              </View>
+              <Text style={[styles.listTypeBadge, { color: colors.accentText }]}>
+                {item.type.toUpperCase()}
+              </Text>
+            </View>
           </View>
 
           <Text style={[styles.listSub, { color: colors.textSecondary }]} numberOfLines={1}>
@@ -110,6 +124,13 @@ export function MangaCard({
           contentFit="cover"
           transition={200}
         />
+
+        {/* Extension Source Badge on Top-Left */}
+        <View style={[styles.gridSourceBadge, { backgroundColor: 'rgba(18, 19, 24, 0.88)' }]}>
+          <Text style={[styles.gridSourceText, { color: colors.accent }]}>
+            {sourceName}
+          </Text>
+        </View>
 
         {/* Progress badge at bottom left of cover */}
         {typeof item.lastReadProgress === 'number' && (
@@ -264,5 +285,29 @@ const styles = StyleSheet.create({
     color: '#121318',
     fontWeight: '800',
     fontSize: 11,
+  },
+  gridSourceBadge: {
+    position: 'absolute',
+    top: 5,
+    left: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: Radius.xs,
+    zIndex: 3,
+  },
+  gridSourceText: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
+  sourceBadgePill: {
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: Radius.xs,
+    borderWidth: 1,
+  },
+  sourceBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
   },
 });

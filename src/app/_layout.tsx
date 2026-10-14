@@ -5,9 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAppTheme } from '../store/preferencesStore';
-import { MangaRepository } from '../db/repositories/mangaRepository';
-import { HistoryRepository } from '../db/repositories/historyRepository';
-import { MOCK_MANGA_LIST } from '../providers/mock/mockData';
+import { getDatabase } from '../db/database';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -26,10 +24,7 @@ export default function RootLayout() {
   useEffect(() => {
     async function setupApp() {
       try {
-        await MangaRepository.resetAndSeed(MOCK_MANGA_LIST);
-        // Seed single demo history entry
-        await HistoryRepository.clearAll();
-        await HistoryRepository.recordProgress('mock:solo-leveling', 'mock:solo-leveling:ch-200', 72, false);
+        await getDatabase();
       } catch (e) {
         console.warn('Failed to initialize database:', e);
       } finally {

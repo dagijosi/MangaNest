@@ -33,6 +33,17 @@ async function initDatabase(db: SQLite.SQLiteDatabase) {
     console.warn('Legacy table cleanup check error:', err);
   }
 
+  // Purge any leftover mock demo data from previous runs
+  try {
+    await db.execAsync(`
+      DELETE FROM manga WHERE id LIKE 'mock:%' OR provider_id = 'mock' OR cover_url LIKE '%unsplash%';
+      DELETE FROM reading_history WHERE manga_id LIKE 'mock:%' OR chapter_id LIKE 'mock:%';
+      DELETE FROM downloads WHERE manga_id LIKE 'mock:%' OR chapter_id LIKE 'mock:%';
+    `);
+  } catch {
+    // Ignore if tables do not exist yet
+  }
+
   // Ensure schema tables exist without conflicting foreign key constraints on dynamic chapter IDs
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS manga (

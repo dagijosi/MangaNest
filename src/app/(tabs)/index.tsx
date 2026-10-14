@@ -2,14 +2,13 @@ import { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
-import { Grid, List, Search as SearchIcon, X } from 'lucide-react-native';
+import { Grid, List, Plus, Search as SearchIcon, X } from 'lucide-react-native';
 import { FilterChips } from '../../components/common/FilterChips';
 import { Header } from '../../components/common/Header';
 import { MangaCard } from '../../components/common/MangaCard';
 import { SearchBar } from '../../components/common/SearchBar';
 import { EmptyState } from '../../components/common/EmptyState';
 import { MangaRepository } from '../../db/repositories/mangaRepository';
-import { MOCK_MANGA_LIST } from '../../providers/mock/mockData';
 import { MangaItem, MangaType } from '../../providers/types';
 import { useAppTheme, usePreferencesStore } from '../../store/preferencesStore';
 
@@ -42,19 +41,10 @@ export default function LibraryScreen() {
         type: activeFilter,
         searchQuery,
       });
-      if (items.length > 0 || searchQuery) {
-        setLibraryItems(items);
-      } else {
-        const fallback = MOCK_MANGA_LIST.filter((item) => {
-          if (!item.inLibrary) return false;
-          if (activeFilter !== 'all' && item.type !== activeFilter) return false;
-          return true;
-        });
-        setLibraryItems(fallback);
-      }
+      setLibraryItems(items);
     } catch (e) {
       console.warn('Failed to load library:', e);
-      setLibraryItems(MOCK_MANGA_LIST.filter((i) => i.inLibrary));
+      setLibraryItems([]);
     }
   }, [activeFilter, searchQuery]);
 
@@ -77,7 +67,7 @@ export default function LibraryScreen() {
     if (isSelectionMode) {
       toggleSelect(item.id);
     } else {
-      router.push(`/manga/${item.sourceId}`);
+      router.push(`/manga/${encodeURIComponent(item.id)}`);
     }
   };
 
@@ -108,6 +98,13 @@ export default function LibraryScreen() {
               </TouchableOpacity>
             ) : (
               <>
+                <TouchableOpacity
+                  onPress={() => router.push('/browse')}
+                  style={styles.iconButton}
+                >
+                  <Plus size={22} color={colors.accent} />
+                </TouchableOpacity>
+
                 <TouchableOpacity
                   onPress={() => setSearchOpen((prev) => !prev)}
                   style={styles.iconButton}
@@ -151,13 +148,13 @@ export default function LibraryScreen() {
       {/* Manga Grid / List */}
       {libraryItems.length === 0 ? (
         <EmptyState
-          title="No manga in this collection"
+          title={searchQuery ? 'No matching manga found' : 'Your Library is Empty'}
           description={
             searchQuery
               ? `No results matching "${searchQuery}". Try a different keyword.`
-              : 'Add your favorite series from the Browse tab to build your library.'
+              : 'Explore popular manga or search by title in Browse to add series to your library.'
           }
-          actionLabel="Go to Browse"
+          actionLabel="Discover Manga"
           onAction={() => router.push('/browse')}
         />
       ) : (

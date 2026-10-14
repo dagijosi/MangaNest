@@ -5,6 +5,7 @@ export interface MangaItem {
   id: string; // Globally unique: `${providerId}:${sourceId}`
   sourceId: string; // Source-specific ID
   providerId: string;
+  providerName?: string; // Human-readable extension/source name (e.g. 'MangaDex', 'ComicK')
   title: string;
   altTitles?: string[];
   coverUrl: string;
