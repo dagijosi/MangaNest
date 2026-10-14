@@ -71,7 +71,7 @@ export default function MangaDetailsScreen() {
   const firstUnread = rawChapters.slice().reverse().find((c) => !c.isRead) || rawChapters[0];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       {/* Top Navigation Bar */}
       <View style={styles.topNav}>
         <TouchableOpacity

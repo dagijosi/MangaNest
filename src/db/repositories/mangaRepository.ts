@@ -146,4 +146,12 @@ export const MangaRepository = {
       }
     }
   },
+
+  async resetAndSeed(items: MangaItem[]): Promise<void> {
+    const db = await getDatabase();
+    await db.runAsync('DELETE FROM manga');
+    for (const item of items) {
+      await this.upsert(item);
+    }
+  },
 };

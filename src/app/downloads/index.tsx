@@ -32,46 +32,6 @@ const INITIAL_DOWNLOADS: DownloadItem[] = [
     totalSize: '2.8 MB',
     status: 'downloading',
   },
-  {
-    id: 'dl-2',
-    mangaTitle: 'Tower of God',
-    chapterTitle: 'Chapter 512',
-    coverUrl: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop&q=80',
-    progress: 18,
-    downloadedSize: '600 KB',
-    totalSize: '3.2 MB',
-    status: 'downloading',
-  },
-  {
-    id: 'dl-3',
-    mangaTitle: 'One Piece',
-    chapterTitle: 'Chapter 1120',
-    coverUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&auto=format&fit=crop&q=80',
-    progress: 0,
-    downloadedSize: 'Waiting...',
-    totalSize: '4.1 MB',
-    status: 'paused',
-  },
-  {
-    id: 'dl-4',
-    mangaTitle: 'Jujutsu Kaisen',
-    chapterTitle: 'Chapter 250',
-    coverUrl: 'https://images.unsplash.com/photo-1569701813229-33284b643e3c?w=400&auto=format&fit=crop&q=80',
-    progress: 100,
-    downloadedSize: '3.6 MB',
-    totalSize: '3.6 MB',
-    status: 'completed',
-  },
-  {
-    id: 'dl-5',
-    mangaTitle: 'The Beginning After The End',
-    chapterTitle: 'Chapter 185',
-    coverUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop&q=80',
-    progress: 100,
-    downloadedSize: '2.9 MB',
-    totalSize: '2.9 MB',
-    status: 'completed',
-  },
 ];
 
 export default function DownloadsScreen() {
@@ -103,7 +63,7 @@ export default function DownloadsScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <Header title="Downloads" subtitle="Offline chapter management" showBack />
 
       {/* Tabs */}

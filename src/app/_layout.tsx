@@ -26,14 +26,10 @@ export default function RootLayout() {
   useEffect(() => {
     async function setupApp() {
       try {
-        await MangaRepository.seedIfEmpty(MOCK_MANGA_LIST);
-        // Seed initial history if empty
-        const history = await HistoryRepository.getRecentHistory(1);
-        if (history.length === 0) {
-          await HistoryRepository.recordProgress('mock:solo-leveling', 'mock:solo-leveling:ch-200', 72, false);
-          await HistoryRepository.recordProgress('mock:one-piece', 'mock:one-piece:ch-1114', 45, false);
-          await HistoryRepository.recordProgress('mock:jujutsu-kaisen', 'mock:jujutsu-kaisen:ch-250', 30, false);
-        }
+        await MangaRepository.resetAndSeed(MOCK_MANGA_LIST);
+        // Seed single demo history entry
+        await HistoryRepository.clearAll();
+        await HistoryRepository.recordProgress('mock:solo-leveling', 'mock:solo-leveling:ch-200', 72, false);
       } catch (e) {
         console.warn('Failed to initialize database:', e);
       } finally {

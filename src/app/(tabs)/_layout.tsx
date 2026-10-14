@@ -1,10 +1,12 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookOpen, Compass, Clock, MoreHorizontal, RefreshCw } from 'lucide-react-native';
 import { useAppTheme } from '../../store/preferencesStore';
 
 export default function TabLayout() {
   const { colors } = useAppTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -16,8 +18,8 @@ export default function TabLayout() {
           backgroundColor: colors.tabBarBackground,
           borderTopColor: colors.tabBarBorder,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          height: 58 + insets.bottom,
+          paddingBottom: Math.max(insets.bottom, 6),
           paddingTop: 6,
         },
         tabBarLabelStyle: {

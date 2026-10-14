@@ -90,7 +90,7 @@ export default function SourcesScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <Header title="Sources" subtitle="Manage content providers & permissions" showBack />
 
       <FilterChips
